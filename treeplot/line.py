@@ -41,7 +41,7 @@ def main():
 
     # test codes
     linePlot((0.1, 0.1), 'Head', (0.3, 0.3), 'Tail', ax)
-    
+
     plt.show()
 
 
