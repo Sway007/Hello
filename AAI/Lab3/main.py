@@ -69,11 +69,11 @@ def main():
     path = greedysearch(mapsize, blocks, init, goal)
     # print(1)        # TODO
 
-    # visualize(mapsize, blocks, init, goal, np.array(path), 'Greedy Search')
+    visualize(mapsize, blocks, init, goal, np.array(path), 'Greedy Search')
     
     path = astarsearch(mapsize, blocks, init, goal)
 
-    # visualize(mapsize, blocks, init, goal, np.array(path), 'A* Search')
+    visualize(mapsize, blocks, init, goal, np.array(path), 'A* Search')
 
 if __name__ == '__main__':
     main()
