@@ -34,6 +34,7 @@ def linePlot(head, headStr, nodePointed, pointedStr, axis):
     nodePlot(nodePointed, pointedStr, axis)
 
 def main():
+    
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set_xlim(0, 1)

@@ -1,0 +1,15 @@
+# Pycharm
+__pycache__/
+.idea/
+*.py[cod]
+*$py.class
+
+# Documents
+*.pdf
+
+# Test files
+test.py
+
+# Debug files
+debug*
+*[Oo]utput

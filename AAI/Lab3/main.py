@@ -48,21 +48,33 @@ def visualize(mapsize, blocks, init, goal, path=None, title=''):
 def main():
     # Problem settings
     ### Design your own map ###
-    mapsize = (20, 12)
+    # mapsize = (20, 12)
     # init = (2, 7)
     # goal = (18, 5)
     # blocks = np.array([(6, i) for i in range(4, 12)] +
     #                   [(13, i) for i in range(0, 8)])
 
+    # mapsize = (20, 12)
     # init = (9, 7)
     # goal = (17, 2)
     # blocks = np.array([(6, i) for i in range(4, 10)] +
     #                   [(i, 4) for i in range(7, 14)] +
     #                   [(13, i) for i in range(5, 10)])
+
     init = (2, 7)
     goal = (28, 5)
     mapsize = (30, 20)
-    blocks = np.array([(5, i) for i in range(2, 20)] + [(23, i) for i in range(0, 15)] + [(15, i) for i in range(4, 20)] + [(9, i) for i in range(0, 15)] + [(i, 11) for i in range(13, 15)] + [(i, 7) for i in range(13, 15)])
+    blocks = np.array([(5, i) for i in range(2, 20)] +
+                      [(23, i) for i in range(0, 15)] +
+                      [(15, i) for i in range(4, 20)] +
+                      [(9, i) for i in range(0, 15)] +
+                      [(i, 11) for i in range(13, 15)] +
+                      [(i, 7) for i in range(13, 15)])
+
+    # init = (2, 7)
+    # goal = (2, 13)
+    # mapsize = (30, 20)
+    # blocks = np.array( [(i, 10) for i in range(0,5)] +[(i, 16) for i in range(5, 25)] + [(5, i) for i in range(2, 16)] + [(23, i) for i in range(0, 12)]  + [(15, i) for i in range(4, 16)] + [(9, i) for i in range(0, 12)]  + [(i, 11) for i in range(13, 15)] + [(i, 7) for i in range(13, 15)] )
 
     # visualize(mapsize, blocks, init, goal)
 
