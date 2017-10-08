@@ -1,6 +1,7 @@
 __author__ = 'Sway007'
+
 from collections import deque
-# import math
+import math
 import copy
 
 ATTRIBUTE_NUM = 5
@@ -127,6 +128,7 @@ def splitTrainingData(recordSet, attrIndex):      # return a dict[attrValue : re
     return ret
 
 def isDataSplitable(dataRecords):
+
     # done if 1. all records classification are the same
     # or 2. no attribute available to split
     resultSet = getAttrValProportionDict(dataRecords, ATTR_RESULT_INDEX)
@@ -216,7 +218,6 @@ def buildingTree(trainingRecords, algorithmV):
                         newDecisionNode.result = v
         else:
             newDecisionNode.result = curDataSet[0][ATTR_RESULT_INDEX]
-            # print(1)
 
     return root
 

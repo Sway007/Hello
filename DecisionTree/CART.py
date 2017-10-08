@@ -12,47 +12,61 @@ LEASTNUM = 4
 class binaryNode:
 
      def __init__(self, splitPoint, value):
+
          self.spoint = splitPoint
-         self.value = value
+         self.value = value                     # average value
          self.lessNext = None
          self.greatNext = None
 
+     def isLeaf(self):
+
+         return self.spoint < 0
+
 
 def isSplitable(records, attrIndex):
+
     s = set([i[attrIndex] for i in records])
     return len(records) > LEASTNUM and len(s) > 1
+
+
+def getVariance(records, average=None):
+
+    l = len(records)
+    if average is None:
+        average = sum([r[-1] for r in records]) / l
+
+    return sum( pow( r[-1] - average, 2) for r in records ) / l
+
 
 def regressionSplit(records, attrIndex):
 
     attrValueSet = list(set([i[attrIndex] for i in records]))
     vll = attrValueSet[0]
-    errsum = sys.float_info.max
+    variance = sys.float_info.max
     retRecordsL = []
     retRecordsG = []
     retValA = 0
 
-    # tmplist = []
-    if isSplitable(records, attrIndex):
+    if isSplitable(records, attrIndex) and variance > 1.0 :
 
         for vlg in attrValueSet[1:]:
 
+            # get the variance
             vla = float((vll + vlg) / 2)
             recordsL = [a[:] for a in records if a[attrIndex] <= vla]
             recordsG = [a[:] for a in records if a[attrIndex] > vla]
-            cL = sum([i[1] for i in recordsL]) / len(recordsL)
-            cG = sum([i[1] for i in recordsG]) / len(recordsG)
 
-            tmpErrsum = sum([pow(r[-1] - cL, 2) for r in recordsL])
-            tmpErrsum = sum([pow(r[-1] - cG, 2) for r in recordsG], tmpErrsum)
-            if errsum > tmpErrsum:
-                errsum = tmpErrsum
+            tmpvariance = getVariance(recordsL) * len(recordsL) + getVariance(recordsG) * len(recordsG)
+
+
+            if variance > tmpvariance:
+                variance = tmpvariance
                 retRecordsL = recordsL
                 retRecordsG = recordsG
                 retValA = vla
 
             vll = vlg
 
-            # tmplist.append([tmpErrsum, vla])
     else:
         retValA = -1
     # for i in tmplist:
@@ -62,6 +76,11 @@ def regressionSplit(records, attrIndex):
     return retValA, retRecordsL, retRecordsG, average
 
 def buildTree(trainingRecords):
+    '''
+
+    :param trainingRecords:
+    :return: a binaryNode with left and right children
+    '''
 
     if not isSplitable(trainingRecords, 0):
         return
@@ -70,6 +89,7 @@ def buildTree(trainingRecords):
     queue = deque([infos[1], infos[2], rootNode])
 
     while len(queue) > 0:
+
         parentNode = queue.pop()
         curGRecords = queue.pop()
 
@@ -94,12 +114,65 @@ def buildTree(trainingRecords):
     return rootNode
 
 
+def treeMergeWithParentNode(parentNode, records):
+    '''
+
+    :param parentNode: root of the try-to-merge subtree
+    :param records:
+    :return:
+    '''
+
+
+
+def treePrune(treeRoot, records):
+    '''
+    method 1.
+    1.depth search tree to find current 2 merge-able leaf nodes
+    2.perform tree merge if pre-merge variance > after-merge variance
+
+    TODO
+    method 2.
+    1.split origin records into:
+            [[sub-records_1_a, spoint1], [sub-records_1_b, spoints1],
+             [sub-records_2_a, spoint2], [sub-records_2_a, spoints2],
+             ...
+             ...
+             [sub-records_i_a, spointi], [sub-records_i_a, spointsi],
+             ...
+             ...]
+    2.try to merge sub-records with the same spoints.
+    3.rebuild tree according to the spoints:
+            **all the spoints in the list above are the attr _spoint_ of leaf node**
+    :param treeRoot:
+    :return:
+    '''
+
+    # 因为n0 = n2 + 1 所以所有非叶节点就是分裂点
+
+    # split the origin records
+    # get all split points
+    splitPoints = []
+    stack = deque(treeRoot)
+    while(len(stack) > 0):
+
+        curParent = stack.pop()
+        if curParent.isleaf:
+            continue
+
+        elif curParent.lessNext.isleaf and curParent.greatNext.isleaf:           # second-level-leaf-node
+            visit curParent
+
+        else:
+            stack.extend(curParent.greatNext, curParent.lessNext)
+
+
+
 # ------------------------------------------------
 
 def trainingDataPreprocess(dataFile):
     '''
     :param dataFile:
-    :return: numpy.array
+    :return: numpy.array which is sorted
     '''
 
     l = []
@@ -137,6 +210,7 @@ def predictValue(treeRoot, testData):
     return curBinaryNode.value
 
 if __name__ == '__main__':
+
    datas = trainingDataPreprocess('train.txt')
    # print(numpy.array(datas))
    # t = regressionSplit(datas, 0)
@@ -146,6 +220,7 @@ if __name__ == '__main__':
 
    fileName = 'testOutput'
    with open(fileName, 'w') as output:
+
        for record in testDatas:
 
             p = predictValue(treeRoot, record[0])
