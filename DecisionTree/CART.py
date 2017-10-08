@@ -114,22 +114,24 @@ def buildTree(trainingRecords):
     return rootNode
 
 
-def treeMergeWithParentNode(parentNode, records):
+def treeMergeWithParentNode(recordsLess, recordsGreat):
     '''
 
     :param parentNode: root of the try-to-merge subtree
     :param records:
     :return:
     '''
+    varPre = getVariance(recordsLess) + getVariance(recordsGreat)
+    mergedRecords = recordsLess[:].extend(recordsGreat)
+    varAfter = getVariance([mergedRecords])
+    if varAfter < varPre:
 
+        # TODO prune the tree
+        pass
 
 
 def treePrune(treeRoot, records):
     '''
-    method 1.
-    1.depth search tree to find current 2 merge-able leaf nodes
-    2.perform tree merge if pre-merge variance > after-merge variance
-
     TODO
     method 2.
     1.split origin records into:
@@ -152,18 +154,46 @@ def treePrune(treeRoot, records):
     # split the origin records
     # get all split points
     splitPoints = []
-    stack = deque(treeRoot)
-    while(len(stack) > 0):
+    stack = deque([treeRoot])
 
-        curParent = stack.pop()
-        if curParent.isleaf:
-            continue
+    # traverse tree in mid-order
+    curNode = stack[-1].lessNext
+    while (len(stack) > 0 or not curNode.isLeaf()):
 
-        elif curParent.lessNext.isleaf and curParent.greatNext.isleaf:           # second-level-leaf-node
-            visit curParent
+        while not curNode.isLeaf():
 
-        else:
-            stack.extend(curParent.greatNext, curParent.lessNext)
+            stack.append(curNode)
+            curNode = curNode.lessNext
+
+        curNode = stack.pop()
+        splitPoints.append(curNode.spoint)
+        curNode = curNode.greatNext
+
+
+    subRecords = []
+    index = 0
+    lsp = -1
+    while True:
+
+        curSp = splitPoints[index]
+
+        subRecords.append( ( [oneRecord for oneRecord in records if lsp < oneRecord[0] < splitPoints[index]],
+                             curSp ) )
+        lsp = splitPoints[index]
+        index += 1
+
+        if index == len(splitPoints):
+            break
+
+        subRecords.append(([oneRecord for oneRecord in records if lsp < oneRecord[0] < splitPoints[index]],
+                           curSp))
+        lsp = splitPoints[index]
+        index += 1
+
+    subRecords.append(([oneRecord for oneRecord in records if oneRecord[0] > splitPoints[-1]],
+                       splitPoints[-1]))
+
+
 
 
 
@@ -216,14 +246,16 @@ if __name__ == '__main__':
    # t = regressionSplit(datas, 0)
    # print(t)
    treeRoot = buildTree(datas)
-   testDatas = getTestRecords('test.txt')
 
-   fileName = 'testOutput'
-   with open(fileName, 'w') as output:
+   treePrune(treeRoot, datas)
 
-       for record in testDatas:
-
-            p = predictValue(treeRoot, record[0])
-            record.append(p)
-            print(record, file=output)
+   # testDatas = getTestRecords('test.txt')
+   # fileName = 'testOutput'
+   # with open(fileName, 'w') as output:
+   #
+   #     for record in testDatas:
+   #
+   #          p = predictValue(treeRoot, record[0])
+   #          record.append(p)
+   #          print(record, file=output)
 
