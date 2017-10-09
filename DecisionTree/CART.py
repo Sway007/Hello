@@ -1,6 +1,6 @@
 __author__ = 'Sway007'
 
-# import numpy
+import graphviz as graph
 import sys
 from collections import deque
 
@@ -77,8 +77,7 @@ def regressionSplit(records, attrIndex):
 
     else:
         retValA = -1
-    # for i in tmplist:
-    #     print(i)
+
     average = sum([i[-1] for i in records]) / len(records)
 
     return retValA, retRecordsL, retRecordsG, average
@@ -171,9 +170,6 @@ def subRecordsMerge(recordsLess, recordsGreat):
     return None if should not merge, else return merged records
     '''
 
-    if recordsGreat is None or recordsLess is None:
-        print('')
-
     varPre = getVariance(recordsLess) + getVariance(recordsGreat)
     mergedRecords = recordsLess[:]
     mergedRecords.extend(recordsGreat)
@@ -183,48 +179,6 @@ def subRecordsMerge(recordsLess, recordsGreat):
         return mergedRecords
     else:
         return None
-
-
-##### TODO delte
-def getSplitPointsOfPrunedNodes(subRecords, treeRoot):
-    '''
-    return split points of pruned parent!!!! nodes , retList: [sp1, sp2, ...],
-    set all the pruned nodes into leaf node.
-    '''
-    retList = []
-    notChangedList = []     # TODO delete
-
-    while len(subRecords) > 0:
-
-        index = 0
-        while index < len(subRecords):
-
-            curRecord = subRecords[index][0]
-            curSp = subRecords[index][1]
-
-            if index == len(subRecords) - 1 or curSp != subRecords[index + 1][1]:  # no part to merge or last one record
-
-                notChangedList.append(curSp)
-
-                del subRecords[index]
-                continue
-            
-            adjRecord = subRecords[index + 1][0]
-            mergedRecords = subRecordsMerge(curRecord, adjRecord)
-            if mergedRecords is None:   # shold not merge
-
-                notChangedList.append(curSp)
-
-                del subRecords[index:index + 2]
-                continue
-
-            psp = getParentSplitPoint(curSp, treeRoot)
-            subRecords[index] = (mergedRecords, psp)
-            del subRecords[index + 1]
-            retList.append(curSp)
-            index += 1
-
-    return sorted(retList)
 
 
 def getSubRecords(treeRoot, records):
@@ -315,7 +269,6 @@ def treePrune(treeRoot, records):
 
     while len(queue) > 0:
 
-        print(queue)
         curNode = queue.pop()
         if curNode.isSecondLevelLeaf():
 
@@ -342,8 +295,6 @@ def treePrune(treeRoot, records):
                 queue.appendleft(curNode.lessNext)
             if not curNode.greatNext.isLeaf():
                 queue.appendleft(curNode.greatNext)
-
-    print(treeRoot)
 
 
 # ------------------------------------------------
@@ -388,6 +339,38 @@ def predictValue(treeRoot, testData):
 
     return curBinaryNode.value
 
+
+count = 0
+def nodeToStr(node):
+
+    global count
+    if node.isLeaf():
+        count += 1
+        return 'Leaf {}'.format(count)
+    else:
+        return str(node.spoint)
+
+def treeView(treeRoot, fileName):
+
+    q = deque([treeRoot])
+    edges = []
+
+    while len(q) > 0:
+
+        curNode = q.pop()
+
+        if curNode.isLeaf():
+            continue
+
+        edges.extend([[nodeToStr(curNode), nodeToStr(curNode.lessNext)], [nodeToStr(curNode), nodeToStr(curNode.greatNext)]])
+        q.extendleft([curNode.lessNext, curNode.greatNext])
+
+
+    G = graph.Digraph(filename=fileName, format='png')
+    G.edges(edges)
+    G.view()
+
+
 if __name__ == '__main__':
 
    datas = trainingDataPreprocess('train.txt')
@@ -396,7 +379,11 @@ if __name__ == '__main__':
    # print(t)
    treeRoot = buildTree(datas)
 
+   treeView(treeRoot, 'preTree')
+
    treePrune(treeRoot, datas)
+
+   treeView(treeRoot, 'afterTree')
 
    testDatas = getTestRecords('test.txt')
    fileName = 'testOutput.txt'
@@ -408,6 +395,4 @@ if __name__ == '__main__':
             record.append(p)
             print(record, file=output)
 
-
-   # print("TODO")
 

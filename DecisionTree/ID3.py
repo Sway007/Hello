@@ -3,6 +3,7 @@ __author__ = 'Sway007'
 import DataTypes
 from DataTypes import *
 from collections import deque
+import graphviz as graph
 
 def trainingDataPreprocess(dataFile):
 
@@ -19,13 +20,6 @@ def trainingDataPreprocess(dataFile):
                 DataTypes.VALUESET_LIST[i].add(s[i])
 
     DataTypes.CLASSIFICATION_SET = DataTypes.VALUESET_LIST[DataTypes.ATTR_RESULT_INDEX]
-
-
-
-
-def id3():
-    # TODO
-    pass
 
 
 ########## test function ###############
