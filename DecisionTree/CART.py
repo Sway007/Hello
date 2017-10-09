@@ -1,6 +1,6 @@
 __author__ = 'Sway007'
 
-import numpy
+# import numpy
 import sys
 from collections import deque
 
@@ -21,6 +21,14 @@ class binaryNode:
      def isLeaf(self):
 
          return self.spoint < 0
+
+     def isSecondLevelLeaf(self):
+
+         return self.lessNext.isLeaf() and self.greatNext.isLeaf() and not self.isLeaf()
+
+     def setLeaf(self):
+
+         self.spoint = -1
 
 
 def isSplitable(records, attrIndex):
@@ -114,51 +122,121 @@ def buildTree(trainingRecords):
     return rootNode
 
 
-def treeMergeWithParentNode(recordsLess, recordsGreat):
+def getParentNode(node, treeRoot):
+
+    parentNode = treeRoot
+    if node.spoint < treeRoot.spoint:
+        curNode = treeRoot.lessNext
+    else:
+        curNode = treeRoot.greatNext
+
+    while not curNode.isLeaf():
+
+        if node.spoint == curNode.spoint:
+            return parentNode
+
+        parentNode = curNode
+        if node.spoint < curNode.spoint:
+            curNode = curNode.lessNext
+        else:
+            curNode = curNode.greatNext
+
+    return None
+
+
+def getParentSplitPoint(sp, treeRoot):
+
+    parentNode = treeRoot
+    if sp < treeRoot.spoint:
+        curNode = treeRoot.lessNext
+    else:
+        curNode = treeRoot.greatNext
+
+    while not curNode.isLeaf():
+
+        if sp == curNode.spoint:
+            return parentNode.spoint
+
+        parentNode = curNode
+        if sp < curNode.spoint:
+            curNode = curNode.lessNext
+        else:
+            curNode = curNode.greatNext
+
+    return None
+
+
+def subRecordsMerge(recordsLess, recordsGreat):
+    '''
+    return None if should not merge, else return merged records
     '''
 
-    :param parentNode: root of the try-to-merge subtree
-    :param records:
-    :return:
-    '''
+    if recordsGreat is None or recordsLess is None:
+        print('')
+
     varPre = getVariance(recordsLess) + getVariance(recordsGreat)
-    mergedRecords = recordsLess[:].extend(recordsGreat)
-    varAfter = getVariance([mergedRecords])
+    mergedRecords = recordsLess[:]
+    mergedRecords.extend(recordsGreat)
+    varAfter = getVariance(mergedRecords)
+
     if varAfter < varPre:
+        return mergedRecords
+    else:
+        return None
 
-        # TODO prune the tree
-        pass
 
-
-def treePrune(treeRoot, records):
+##### TODO delte
+def getSplitPointsOfPrunedNodes(subRecords, treeRoot):
     '''
-    TODO
-    method 2.
-    1.split origin records into:
-            [[sub-records_1_a, spoint1], [sub-records_1_b, spoints1],
-             [sub-records_2_a, spoint2], [sub-records_2_a, spoints2],
-             ...
-             ...
-             [sub-records_i_a, spointi], [sub-records_i_a, spointsi],
-             ...
-             ...]
-    2.try to merge sub-records with the same spoints.
-    3.rebuild tree according to the spoints:
-            **all the spoints in the list above are the attr _spoint_ of leaf node**
-    :param treeRoot:
-    :return:
+    return split points of pruned parent!!!! nodes , retList: [sp1, sp2, ...],
+    set all the pruned nodes into leaf node.
     '''
+    retList = []
+    notChangedList = []     # TODO delete
 
-    # 因为n0 = n2 + 1 所以所有非叶节点就是分裂点
+    while len(subRecords) > 0:
 
-    # split the origin records
-    # get all split points
+        index = 0
+        while index < len(subRecords):
+
+            curRecord = subRecords[index][0]
+            curSp = subRecords[index][1]
+
+            if index == len(subRecords) - 1 or curSp != subRecords[index + 1][1]:  # no part to merge or last one record
+
+                notChangedList.append(curSp)
+
+                del subRecords[index]
+                continue
+            
+            adjRecord = subRecords[index + 1][0]
+            mergedRecords = subRecordsMerge(curRecord, adjRecord)
+            if mergedRecords is None:   # shold not merge
+
+                notChangedList.append(curSp)
+
+                del subRecords[index:index + 2]
+                continue
+
+            psp = getParentSplitPoint(curSp, treeRoot)
+            subRecords[index] = (mergedRecords, psp)
+            del subRecords[index + 1]
+            retList.append(curSp)
+            index += 1
+
+    return sorted(retList)
+
+
+def getSubRecords(treeRoot, records):
+    '''
+    return list:
+    '''
     splitPoints = []
     stack = deque([treeRoot])
 
     # traverse tree in mid-order
     curNode = stack[-1].lessNext
-    while (len(stack) > 0 or not curNode.isLeaf()):
+    while len(stack) > 0 or not curNode.isLeaf():
 
         while not curNode.isLeaf():
 
@@ -183,18 +261,89 @@ def treePrune(treeRoot, records):
         index += 1
 
         if index == len(splitPoints):
+            subRecords.append( ( [oneRecord for oneRecord in records if splitPoints[-1] < oneRecord[0] ],
+                             curSp + 1 ) )
+            break
+        #
+        # subRecords.append(([oneRecord for oneRecord in records if lsp < oneRecord[0] < splitPoints[index]],
+        #                    curSp))
+        # lsp = splitPoints[index]
+        # index += 1
+
+    # subRecords.append(([oneRecord for oneRecord in records if oneRecord[0] > splitPoints[-1]],
+    #                    splitPoints[-1]))
+    return subRecords
+
+
+def getSubLeafRecords(node, allSubRecords):
+
+    sp = node.spoint
+    recordsLess = None
+    recordsGreat = None
+
+    spList = [i[1] for i in allSubRecords]
+    spLess = max([csp for csp in spList if csp <= sp])
+    spGreat = min([csp for csp in spList if csp > sp])
+
+    for subrecords in allSubRecords:
+        if spLess - 0.005 < subrecords[1] < spLess + 0.005:
+            recordsLess = subrecords[0]
+        elif spGreat - 0.005 < subrecords[1] < spGreat + 0.005:
+            recordsGreat = subrecords[0]
+        elif recordsLess and recordsGreat:
             break
 
-        subRecords.append(([oneRecord for oneRecord in records if lsp < oneRecord[0] < splitPoints[index]],
-                           curSp))
-        lsp = splitPoints[index]
-        index += 1
-
-    subRecords.append(([oneRecord for oneRecord in records if oneRecord[0] > splitPoints[-1]],
-                       splitPoints[-1]))
+    return (recordsLess, spLess), (recordsGreat, spGreat)
 
 
+def treePrune(treeRoot, records):
+    '''
+    TODO
+    method 2.
+    try to find all second-level leaf, and pack into queue q
+    while q is not empty:
+        n = q.pop()
+        n' = merge n.
+        if mergable, q.push(n')
+    :return:
+    '''
 
+    subRecords = getSubRecords(treeRoot, records)
+    queue = deque([treeRoot])
+
+    testList = []
+
+    while len(queue) > 0:
+
+        print(queue)
+        curNode = queue.pop()
+        if curNode.isSecondLevelLeaf():
+
+            curLessAndGreatRecords = getSubLeafRecords(curNode, subRecords)
+            mergedRecords = subRecordsMerge(curLessAndGreatRecords[0][0], curLessAndGreatRecords[1][0])
+            if mergedRecords is not None:   # should merge
+
+                testList.append(curNode.spoint)
+
+                subRecords.remove(curLessAndGreatRecords[0])
+                subRecords.remove(curLessAndGreatRecords[1])
+                newsp = curLessAndGreatRecords[1][1]
+                subRecords.append((mergedRecords, newsp))
+
+                pNode = getParentNode(curNode, treeRoot)
+                queue.appendleft(pNode)
+                curNode.setLeaf()
+
+            else:
+                continue
+
+        elif not curNode.isLeaf():
+            if not curNode.lessNext.isLeaf():
+                queue.appendleft(curNode.lessNext)
+            if not curNode.greatNext.isLeaf():
+                queue.appendleft(curNode.greatNext)
+
+    print(treeRoot)
 
 
 # ------------------------------------------------
@@ -249,13 +398,16 @@ if __name__ == '__main__':
 
    treePrune(treeRoot, datas)
 
-   # testDatas = getTestRecords('test.txt')
-   # fileName = 'testOutput'
-   # with open(fileName, 'w') as output:
-   #
-   #     for record in testDatas:
-   #
-   #          p = predictValue(treeRoot, record[0])
-   #          record.append(p)
-   #          print(record, file=output)
+   testDatas = getTestRecords('test.txt')
+   fileName = 'testOutput.txt'
+   with open(fileName, 'w') as output:
+
+       for record in testDatas:
+
+            p = predictValue(treeRoot, record[0])
+            record.append(p)
+            print(record, file=output)
+
+
+   # print("TODO")
 

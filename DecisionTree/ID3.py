@@ -80,4 +80,7 @@ if __name__ == '__main__' :
     # print(getAttrEntropySum(ALL_DATA_RECORDS_LIST, 4))
     # print(getBestAttrIndex(ALL_DATA_RECORDS_LIST, [i for i in range(5) if i != ATTR_RESULT_INDEX]))
     tree = buildingTree(ALL_DATA_RECORDS_LIST, 1)
-    printDecisionTree(tree, 'debug_log.txt')
+    printDecisionTree(tree, 'debug_log_id3.txt')
+
+    treeC45 = buildingTree(ALL_DATA_RECORDS_LIST, 2)
+    printDecisionTree(treeC45, 'debug_log_c45.txt')
