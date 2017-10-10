@@ -1,11 +1,8 @@
-import graphviz as gv
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import numpy as np
 
-g1 = gv.Digraph(filename='test')
+img = mpimg.imread('./test.png')
 
-g1.edges([['A', 'B'], ['A', 'C'], ('B', 'D'), ('B', 'E')])
-
-# g1.edge
-# g1.edge('B', 'D')
-# g1.edge('B', 'E')
-
-g1.render(filename='test', view=True)
+print(img)
+imgplot = plt.imshow(img)
