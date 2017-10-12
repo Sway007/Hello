@@ -138,12 +138,14 @@ def findPath(mapsize, blocks, init, goal, algrotithmV):
         frontiers.remove(expandedEdge)
         pathEdgesVisited.append(expandedEdge)
 
-        # add new frontiers
+        # add new frontier
         potentialFrontiers = getFrontiers(expandedEdge[1], mapsize)
 
         detectedFrontiers = [i[1] for i in frontiers]
         # new frontier shuold not in detected frontiers for avoiding
-        frontiers.extend( [[expandedEdge[1], i] for i in potentialFrontiers if i not in visted and i not in realBlocks and i not in detectedFrontiers] )
+        frontiers.extend( [[expandedEdge[1], i] for i in potentialFrontiers if i not in visted and i not in realBlocks
+                           and i not in detectedFrontiers
+                           ] )
 
     return getPathFromEdges(pathEdgesVisited, init)
 
