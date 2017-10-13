@@ -20,3 +20,36 @@
  Let $A_{ij}=\sum_{n=0}^Mx_n^{i+j}$ , $T_i=\sum_{n=1}^Nt_nx_n^i$ . eventually, we got
  
  $$\sum_{j=0}^MA_{ij}w_j=T_i$$
+
+
+## 1.2
+$$E(W)=\frac{1}{2}\sum^N_{n=1}\{y(x_n,W)-t_n\} + \frac{\lambda}{2}||W||^2$$
+
+derivatitive $E(W)$ with respect to $w_i$, wo obtain
+
+$$\frac{\partial{E(W)}}{\partial{w_i}}=\sum_{n=1}^{N}\{\sum_{j=0}^Mw_jx_n^j-t_n\}x_n^i + \lambda w_i$$
+
+set the derivative to 0 
+
+$$\sum_{n=1}^N\sum_{j=0}^Mx_n^{i+j}w_j - \sum_{n=1}^Nx_n^it_n + \lambda w_i = 0$$
+
+and with the  notation of **exercise 1.1**, we have
+
+$$\sum_{j=0}^MA_{ij}w_j - T_i + \lambda w_i = 0$$
+
+## 1.3
+
+* <font size="4">Probability of selecting an apple </font>
+
+Denote the probability of selecting an apple with $P(A)$, and denote the probability of selecting from box `b, g, r` with respectively $P(A, b), P(A, g), P(A, r)$. 
+According to _**the law of total probability**_, we have
+
+$$P(A) = P(A, b) + P(A, g) + P(A, r)$$
+$$P(A) = P(A| b) * p(b) + P(A|g) * p(g) + P(A| r) * p(r)$$
+
+from the description of textbook we can infer easily that: $P(A|r)=3/10, P(A|b)=1/2, P(A|g)=3/10$. so:
+
+$$P(A) = \frac{3}{10} * 0.2 + \frac12 * 0.2+ \frac{3}{10} * 0.6 = 0.34$$
+
+* `Probability that select an orange from the green box`
+
