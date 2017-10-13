@@ -1,4 +1,4 @@
-## 1.1
+## <font color="blue"> 1.1 </font>
 <font size=4>Proof:</font>
 
  Let:
@@ -22,7 +22,7 @@
  $$\sum_{j=0}^MA_{ij}w_j=T_i$$
 
 
-## 1.2
+## <font color="blue"> 1.2 </font>
 $$E(W)=\frac{1}{2}\sum^N_{n=1}\{y(x_n,W)-t_n\} + \frac{\lambda}{2}||W||^2$$
 
 derivatitive $E(W)$ with respect to $w_i$, wo obtain
@@ -37,14 +37,14 @@ and with the  notation of **exercise 1.1**, we have
 
 $$\sum_{j=0}^MA_{ij}w_j - T_i + \lambda w_i = 0$$
 
-## 1.3
+## <font color="blue"> 1.3 </font>
 
 * <font size="4">Probability of selecting an apple </font>
 
     Denote the probability of selecting an apple with $P(A)$, and denote the probability of selecting from box `b, g, r` with respectively $P(A, b), P(A, g), P(A, r)$. 
     According to _**the law of total probability**_, we have
 
-    $$P(A) = P(A, b) + P(A, g) + P(A, r)$$
+    $$P(A) = P(A, b) + P(A, g) + P(A, r) $$
     $$P(A) = P(A| b) * p(b) + P(A|g) * p(g) + P(A| r) * p(r)$$
 
     from the description of textbook we can infer easily that: $P(A|r)=3/10$, $P(A|b)=1/2$, $P(A|g)=3/10$. so:
@@ -62,4 +62,49 @@ $$\sum_{j=0}^MA_{ij}w_j - T_i + \lambda w_i = 0$$
     $$P(g|O) = \frac{\frac{3}{10} * 0.6}{\frac{4}{10} * 0.2 + \frac{3}{10} * 0.6 + \frac12*0.2} = 0.5$$
 
 
-## TODO
+## <font color="blue"> 1.6 </font>
+
+First, I try to show that _**`the joint probability's Expectation of two independent variables equals to the multiplication of the two variable's Expectation`**_, namely:
+
+
+$$E(XY) = E(X)E(Y)\qquad if X\ and\ Y\ is\ dependent \qquad (1) $$
+
+Proof:
+
+$$E(XY) = \int xyf(xy)dxdy$$
+$$E(XY)=\int xyf(x)f(y)dxdy$$
+$$E(XY)=\int xf(x)dx\ *\ \int yf(y)dy = E(X) * E(Y) $$
+
+then the covariance of X and Y:
+
+$$COV(X, Y) = E(\ (X - EX)(Y-EY)\ )$$
+$$COV(X, Y) = E(XY) - E(X)E(Y)$$
+
+according to **(1)**, we get
+
+$$COV(X, Y) = 0$$
+
+
+## <font color="blue"> 1.10 </font>
+
+* Expectaion:
+
+    $$E(X+Y) = \int(x+y)f(x, y)dxdy$$
+    $$E(X+Y) = \int x\int f(x,y)dydx\ +\ \int y\int f(x,y)dxdy $$
+    $$E(X+Y) = \int xf_{X}(x)dx + \int yf_{Y}(y)dy$$
+    $$E(X+Y) = E(X) + E(Y)$$
+
+* Variance:
+
+    $$var(X + Y) = E(X+Y)^2 - (E(X+Y))^2$$
+    $$var(X + Y) = E(X^2 + Y^2 + 2XY) - (EX + EY)^2$$
+    $$var(X + Y) = EX^2 + EY^2 + 2EXY - (EX)^2 - (EY)^2 - 2EXEY$$
+
+    cause X and Y is dependent, so $EXY=EX\;EY$, then we get:
+
+    $$var(X + Y) = EX^2 - (EX)^2 + EY^2 - (EY)^2$$
+    $$var(X + Y) = var(X) + var(Y)$$
+
+## <font color="blue"> 1.17 </font>
+
+TODO
