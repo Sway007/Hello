@@ -41,15 +41,25 @@ $$\sum_{j=0}^MA_{ij}w_j - T_i + \lambda w_i = 0$$
 
 * <font size="4">Probability of selecting an apple </font>
 
-Denote the probability of selecting an apple with $P(A)$, and denote the probability of selecting from box `b, g, r` with respectively $P(A, b), P(A, g), P(A, r)$. 
-According to _**the law of total probability**_, we have
+    Denote the probability of selecting an apple with $P(A)$, and denote the probability of selecting from box `b, g, r` with respectively $P(A, b), P(A, g), P(A, r)$. 
+    According to _**the law of total probability**_, we have
 
-$$P(A) = P(A, b) + P(A, g) + P(A, r)$$
-$$P(A) = P(A| b) * p(b) + P(A|g) * p(g) + P(A| r) * p(r)$$
+    $$P(A) = P(A, b) + P(A, g) + P(A, r)$$
+    $$P(A) = P(A| b) * p(b) + P(A|g) * p(g) + P(A| r) * p(r)$$
 
-from the description of textbook we can infer easily that: $P(A|r)=3/10, P(A|b)=1/2, P(A|g)=3/10$. so:
+    from the description of textbook we can infer easily that: $P(A|r)=3/10$, $P(A|b)=1/2$, $P(A|g)=3/10$. so:
 
-$$P(A) = \frac{3}{10} * 0.2 + \frac12 * 0.2+ \frac{3}{10} * 0.6 = 0.34$$
+    $$P(A) = \frac{3}{10} * 0.2 + \frac12 * 0.2+ \frac{3}{10} * 0.6 = 0.34$$
 
-* `Probability that select an orange from the green box`
+* <font size="4">Probability that select an orange from the green box</font>
 
+    we denote the event that selecting an _**orange**_ with _**O**_,  then the probability we try to figure out can be represented as $P(g | O)$. according to _**Bayes Theorem**_, 
+
+    $$P(g|O) =  \frac{P(g, O)}{P(O)} = \frac{P(O|g) P(g)}{P(O|r)P(r) + P(O|g)P(g) + P(O|b)P(b)}$$
+
+    cause $P(O|r)=4/10$, $P(O|g) = 3/10$, $P(O|b) = 1/2$, so:
+
+    $$P(g|O) = \frac{\frac{3}{10} * 0.6}{\frac{4}{10} * 0.2 + \frac{3}{10} * 0.6 + \frac12*0.2} = 0.5$$
+
+
+## TODO
