@@ -52,28 +52,45 @@ def k_means_2d(datas, centerNum):
     return clustering(centers, datas, 10)
 
 
+def drawPoints(points, style, axis):
+
+    points = np.array(points)
+    x = points[:, 0]
+    y = points[:, 1]
+    axis.plot(x, y, style)
+
 def draw(datas, centers):
 
     fig = plt.figure()
-    ax = fig.add_subplot(1,1,1)
+    ax = fig.add_subplot(1 , 1 , 1)
 
-    print(datas)
+    colors = 'bgrcmykw'
+    colori = 0
 
-    tmp = np.concatenate(datas[:], axis=0)
-    x = tmp[:,0]
-    y = tmp[:,1]
+    for oneCluster in datas:
 
-    ax.plot(x, y, 'bo')
-    ax.set_xlim(0,30)
-    ax.set_ylim(0,30)
+        drawPoints(oneCluster, colors[colori] + 'o', ax)
+        colori += 1
+
+    # tmp = np.concatenate(datas[:], axis=0)
+    # drawPoints(tmp, 'bo', ax)
+
+    drawPoints(centers, 'k*', ax)
+
     plt.show()
 
 
-if __name__=='__main__':
-    datas = np.array([
-        [0,0], [5,5], [3,3], [2,2],
-        [20,20], [25,25], [23, 23], [22, 22]
-    ])
-    centers, clusters = k_means_2d(datas, 2)
+if __name__ == '__main__':
+
+    size = 1000
+    k = 6
+
+    xarray = np.random.randint(50000, size=size).reshape(size, 1)
+    yarray = np.random.randint(50000, size=size).reshape(size, 1)
+
+    ndatas = np.concatenate((xarray, yarray), axis=1)
+
+
+    centers, clusters = k_means_2d(ndatas, k)
 
     draw(clusters, centers)
