@@ -1,6 +1,5 @@
 import numpy as np 
 import scipy.spatial.distance as distance
-import random
 import csv
 
 import matplotlib.pyplot as plt
@@ -37,6 +36,7 @@ def clustering(centers, datas, iterNum, history=True):
     '''
     centers: numpy.array
     datas: numpy.array
+    history: switch if maintain 'historyDatas' for animation data
     return clusters:tuple(centers[], [[c1points], [c2points], ...])
     '''
 
@@ -77,6 +77,7 @@ def clustering(centers, datas, iterNum, history=True):
 def k_means(datas, centerNum, history=True):
     '''
     datas: numpy.array
+    history: flag for method 'clustering'
     return clusters:dict{center index: [points]}
     '''
     centers = getInitCenters(datas, centerNum)
