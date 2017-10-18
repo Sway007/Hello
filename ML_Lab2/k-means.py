@@ -36,6 +36,9 @@ def clustering(centers, datas, iterNum):
     datas: numpy.array
     return clusters:tuple(centers[], [[c1points], [c2points], ...])
     '''
+
+    historyDatas = []  #    for the animation
+
     while iterNum > 0:
 
         retCluster = [[] for i in centers]
@@ -48,11 +51,15 @@ def clustering(centers, datas, iterNum):
             cIndex = maxInfo[i]
             retCluster[cIndex].append( datas[i] )
 
+        historyDatas.append([centers, retCluster])
+
         centers = np.array([np.mean(i, axis=0) for i in retCluster])
 
         iterNum -= 1
 
-    return centers, retCluster
+    historyDatas.append([centers, retCluster])
+
+    return (centers, retCluster, historyDatas)
 
 
 def k_means_2d(datas, centerNum):
@@ -62,7 +69,7 @@ def k_means_2d(datas, centerNum):
     '''
     centers = getInitCenters(datas, centerNum)
 
-    return clustering(centers, datas, 20)
+    return clustering(centers, datas, 10)
 
 
 def clustering_medoids(centers, datas, iterNum):
@@ -78,9 +85,6 @@ def clustering_medoids(centers, datas, iterNum):
 
         disMatrix = distance.cdist(datas, centers, metric='euclidean')
         minInfo = np.argmin(disMatrix, axis=1)
-
-        # print(disMatrix)
-        # print(minInfo)
 
         for i in range(datas.shape[0]):
 
@@ -119,20 +123,43 @@ def drawPoints(points, style, axis, markersize=3.):
     points = np.array(points)
     x = points[:, 0]
     y = points[:, 1]
-    axis.plot(x, y, style, markersize=markersize)
+    artist,  = axis.plot(x, y, style, markersize=markersize)
+
+    return artist
 
 def draw(datas, centers, ax):
 
     colors = 'bgrcmykw'
     colori = 0
 
+    pointsArtist = []
+
     for oneCluster in datas:
 
-        drawPoints(oneCluster, colors[colori] + 'o', ax)
+        pa = drawPoints(oneCluster, colors[colori] + 'o', ax)
+
+        pointsArtist.append(pa)
         colori += 1
 
-    drawPoints(centers, 'k*', ax, markersize=5.)
+    centerArtist = drawPoints(centers, 'y*', ax, markersize=5.)
 
+    return centerArtist, pointsArtist
+
+
+def update(newData, centerArtist, clustersArtist):
+
+    centers, clusters = newData
+
+    xdca, ydca = np.array(centers)[:, 0], np.array(centers)[:, 1]
+    centerArtist.set_data(xdca, ydca)
+
+    clusterInfos = zip(clustersArtist, clusters)
+    for info in clusterInfos:
+
+        ca, cdata = info
+        xd = np.array(cdata)[:, 0]
+        yd = np.array(cdata)[:, 1]
+        ca.set_data(xd, yd)
 
 
 if __name__ == '__main__':
@@ -151,8 +178,12 @@ if __name__ == '__main__':
 
     ax1 = fig.add_subplot(1, 2, 1)
     ax1.set_title('K-means')
-    centers, clusters = k_means_2d(ndatas, k)
-    draw(clusters, centers, ax1)
+    centers, clusters, historyDatas = k_means_2d(ndatas, k)
+    ca, pas = draw(clusters, centers, ax1)
+
+    ani = anim.FuncAnimation(fig, update, frames=historyDatas,
+                       fargs=(ca, pas), interval=800)
+
 
     ax2 = fig.add_subplot(1, 2, 2)
     ax2.set_title('K-medoids')
