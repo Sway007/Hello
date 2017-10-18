@@ -22,54 +22,66 @@ def getInitCenters(datas, k):
     '''
 
     '''
-    cs = set()
-    while len(cs) < k:
-        n = random.randint(0, len(datas) - 1)
-        cs.add(n)
+    # cs = set()
+    # while len(cs) < k:
+    #     n = random.randint(0, len(datas) - 1)
+    #     cs.add(n)
+
+    l = len(datas)
+    cs = range(0, l, int((l-10) / (k-1)))
 
     return datas[list(cs)]
 
 
-def clustering(centers, datas, iterNum):
+def clustering(centers, datas, iterNum, history=True):
     '''
     centers: numpy.array
     datas: numpy.array
     return clusters:tuple(centers[], [[c1points], [c2points], ...])
     '''
 
-    historyDatas = []  #    for the animation
+    historyDatas = []  # for the animation
 
     while iterNum > 0:
 
         retCluster = [[] for i in centers]
+        retClusterIndexs = retCluster.copy()
         
         disMatrix = distance.cdist(datas, centers, metric='euclidean')
         maxInfo = np.argmin(disMatrix, axis=1)
         
-        for i in range(datas.shape[0]):
-            
-            cIndex = maxInfo[i]
-            retCluster[cIndex].append( datas[i] )
+        # for i in range(datas.shape[0]):
+        #
+        #     cIndex = maxInfo[i]
+        #     retCluster[cIndex].append( datas[i] )
 
-        historyDatas.append([centers, retCluster])
+        for i in range(len(centers)):
+
+            cindArray = np.where(maxInfo == i)
+            retCluster[i] = datas[cindArray]
+            retClusterIndexs[i] = cindArray
+
+        if history:
+            historyDatas.append([centers, retCluster])
 
         centers = np.array([np.mean(i, axis=0) for i in retCluster])
 
         iterNum -= 1
 
-    historyDatas.append([centers, retCluster])
+    if history:
+        historyDatas.append([centers, retCluster])
 
-    return (centers, retCluster, historyDatas)
+    return centers, retCluster, historyDatas, retClusterIndexs
 
 
-def k_means_2d(datas, centerNum):
+def k_means(datas, centerNum, history=True):
     '''
     datas: numpy.array
     return clusters:dict{center index: [points]}
     '''
     centers = getInitCenters(datas, centerNum)
 
-    return clustering(centers, datas, 10)
+    return clustering(centers, datas, 10, history)
 
 
 def clustering_medoids(centers, datas, iterNum):
@@ -111,7 +123,7 @@ def clustering_medoids(centers, datas, iterNum):
 def k_medoids_2d(datas, centerNum):
     '''
     :param datas: numpy.array
-    :return: same as k_means_2d
+    :return: same as k_means
     '''
     centers = getInitCenters(datas, centerNum)
 
@@ -123,7 +135,7 @@ def drawPoints(points, style, axis, markersize=3.):
     points = np.array(points)
     x = points[:, 0]
     y = points[:, 1]
-    artist,  = axis.plot(x, y, style, markersize=markersize)
+    artist, _ = axis.plot(x, y, style, markersize=markersize)
 
     return artist
 
@@ -178,7 +190,7 @@ if __name__ == '__main__':
 
     ax1 = fig.add_subplot(1, 2, 1)
     ax1.set_title('K-means')
-    centers, clusters, historyDatas = k_means_2d(ndatas, k)
+    centers, clusters, historyDatas, _ = k_means(ndatas, k)
     ca, pas = draw(clusters, centers, ax1)
 
     ani = anim.FuncAnimation(fig, update, frames=historyDatas,
