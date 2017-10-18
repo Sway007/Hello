@@ -135,7 +135,7 @@ def drawPoints(points, style, axis, markersize=3.):
     points = np.array(points)
     x = points[:, 0]
     y = points[:, 1]
-    artist, _ = axis.plot(x, y, style, markersize=markersize)
+    artist,  = axis.plot(x, y, style, markersize=markersize)
 
     return artist
 
