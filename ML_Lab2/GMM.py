@@ -22,7 +22,8 @@ def getGaussianDisPro(varX, mu, sigma):
 # get posterior probability that var j is generate by mode i
 def getPosterior(varInd, modeInd, probMatrix):
 
-    return probMatrix[modeInd, varInd] / np.sum(probMatrix[:, varInd])
+    tmp = probMatrix[modeInd, varInd] / np.sum(probMatrix[:, varInd])
+    return tmp
 
 
 class GMM:
@@ -43,7 +44,7 @@ class GMM:
         self._alphas = np.array([1. / self.n for i in range(self.n)])
         # self._mus = np.random.randint(0, 3 * len(trainingData), size=self.n)
         # TODO just for test, delete below
-        self._mus = np.array([trainingDatas[6, :], trainingDatas[22, :], trainingDatas[27, :]])
+        self._mus = np.array([trainingDatas[5, :], trainingDatas[21, :], trainingDatas[26, :]])
         # Done
         self._varianceMatrix = [np.eye(d, k=0, dtype=float) * 0.1 for i in range(self.n)]
 
@@ -59,8 +60,6 @@ class GMM:
 
             count += 1
 
-            # assert trainingDatas[0].shape == (1, self.n), 'training data dimension \
-            #                                                not matched'
             # get probability matrix such as:
             #     x1, x2, ..., xn
             #     -----------------
@@ -68,7 +67,6 @@ class GMM:
             # M2 | p21 p22 ...  p2n
             # ...| ...
             # Mk | pk1 pk2 ...  pkn
-            # i = 0
             l = []
             for i in range(self.n):
                 l.append(self._alphas[i] * np.apply_along_axis(getGaussianDisPro, 1, trainingDatas,
@@ -81,11 +79,6 @@ class GMM:
                                                 for i in range(self.n)])
             self._alphas *= 1. / len(trainingDatas)
             assert 0.999 < np.sum(self._alphas) < 1.001, 'Error!'
-
-            self._mus = np.array([ np.sum([getPosterior(j, i, probMatrix) * trainingDatas[j] for j in range(len(trainingDatas))]) / \
-                          np.sum([getPosterior(j, i, probMatrix) for j in range(len(trainingDatas))])
-                                 for i in range(self.n)]
-                                 )
 
             def vectorSqure(vec):
 
@@ -100,10 +93,16 @@ class GMM:
                     ret += m
                 return ret
 
+            self._mus = np.array([ multiMatixAdd([getPosterior(j, i, probMatrix) * trainingDatas[j] for j in range(len(trainingDatas))]) / \
+                                   np.sum([getPosterior(j, i, probMatrix) for j in range(len(trainingDatas))])
+                                   for i in range(self.n)]
+                                 )
+
             self._varianceMatrix = np.array([ multiMatixAdd([vectorSqure(trainingDatas[j] - self._mus[i]) * getPosterior(j, i, probMatrix) for j in range(len(trainingDatas))]) / \
                                      np.sum([getPosterior(j, i, probMatrix) for j in range(len(trainingDatas))])
                                      for i in range(self.n)
                                    ])
+
 
     def getClusters(self, datas):
         '''
@@ -121,7 +120,9 @@ class GMM:
         clusterIndArray = np.argmax(posteriorMatrix, axis=0)
         retClusters = [np.where(clusterIndArray == i)[-1] for i in range(self.n)]
 
-        return retClusters
+        retCenters = self._mus
+
+        return retClusters, retCenters
 
 
 def getTrainingData(file):
@@ -136,16 +137,20 @@ def getTrainingData(file):
 if __name__ == '__main__':
 
     trainingData = getTrainingData('table4_0')
-    gmm = GMM(3, iterNum=50)
+    iterNum = 50
+    gmm = GMM(3, iterNum=iterNum)
     gmm.trainMode(trainingData)
-    clusters = gmm.getClusters(trainingData)
+    clusters, centers = gmm.getClusters(trainingData)
 
     # visualize
     fig = plt.figure()
+    fig.suptitle('Gaussian Mixture Mode Clustering')
     ax = fig.add_subplot(111)
-    ax.set_title('Gaussian Mixture Mode Clustering')
+    ax.set_title('Iteration Number = {}'.format(iterNum))
+    ax.set_xlim(0.1, 0.9)
+    ax.set_ylim(0, 0.8)
 
     datas = [trainingData[index] for index in clusters]
-    draw(datas, ax)
+    draw(datas, ax, centers)
 
     plt.show()

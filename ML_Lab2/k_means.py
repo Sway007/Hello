@@ -143,13 +143,14 @@ def drawPoints(points, style, axis, markersize=3.):
 def draw(datas, ax, centers=None):
 
     colors = 'bgrcmykw'
+    styles = 'os2p*h+D'
     colori = 0
 
     pointsArtist = []
 
     for oneCluster in datas:
 
-        pa = drawPoints(oneCluster, colors[colori] + 'o', ax)
+        pa = drawPoints(oneCluster, colors[colori] + styles[colori], ax)
 
         pointsArtist.append(pa)
         colori += 1
