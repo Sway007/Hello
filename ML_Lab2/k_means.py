@@ -140,7 +140,7 @@ def drawPoints(points, style, axis, markersize=3.):
 
     return artist
 
-def draw(datas, centers, ax):
+def draw(datas, ax, centers=None):
 
     colors = 'bgrcmykw'
     colori = 0
@@ -154,7 +154,9 @@ def draw(datas, centers, ax):
         pointsArtist.append(pa)
         colori += 1
 
-    centerArtist = drawPoints(centers, 'y*', ax, markersize=5.)
+    centerArtist = None
+    if centers is not None:
+        centerArtist = drawPoints(centers, 'y*', ax, markersize=5.)
 
     return centerArtist, pointsArtist
 
@@ -192,7 +194,7 @@ if __name__ == '__main__':
     ax1 = fig.add_subplot(1, 2, 1)
     ax1.set_title('K-means')
     centers, clusters, historyDatas, _ = k_means(ndatas, k)
-    ca, pas = draw(clusters, centers, ax1)
+    ca, pas = draw(clusters, ax1, centers)
 
     ani = anim.FuncAnimation(fig, update, frames=historyDatas,
                        fargs=(ca, pas), interval=800)
@@ -201,6 +203,6 @@ if __name__ == '__main__':
     ax2 = fig.add_subplot(1, 2, 2)
     ax2.set_title('K-medoids')
     centers, clusters = k_medoids_2d(ndatas, k)
-    draw(clusters, centers, ax2)
+    draw(clusters, ax2, centers)
 
     plt.show()
