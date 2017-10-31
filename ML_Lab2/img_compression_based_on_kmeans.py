@@ -36,6 +36,7 @@ def imgWithKmeans(imgFile, k):
 def main():
 
     imgWithKmeans('me.png', 4)
+    # imgWithKmeans('11.jpg', 4)
 
 if __name__ == '__main__':
 

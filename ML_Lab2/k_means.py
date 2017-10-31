@@ -197,8 +197,8 @@ if __name__ == '__main__':
     centers, clusters, historyDatas, _ = k_means(ndatas, k)
     ca, pas = draw(clusters, ax1, centers)
 
-    ani = anim.FuncAnimation(fig, update, frames=historyDatas,
-                       fargs=(ca, pas), interval=800)
+    # ani = anim.FuncAnimation(fig, update, frames=historyDatas,
+    #                    fargs=(ca, pas), interval=800)
 
 
     ax2 = fig.add_subplot(1, 2, 2)
