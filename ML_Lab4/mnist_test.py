@@ -2,15 +2,23 @@ from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("MNIST_data", one_hot=True)
 
 import tensorflow as tf
+
+import math
+
+hiddenLayerSize = (int)(math.log2(784) + 4)
+print(hiddenLayerSize)
+
 x = tf.placeholder(tf.float32, [None, 784])
-W = tf.Variable(tf.zeros([784, 10]))
+W = tf.Variable(tf.zeros([hiddenLayerSize, 10]))
 b = tf.Variable(tf.zeros([10]))
-# y = tf.nn.softmax(tf.matmul(x, W) + b)
-y = tf.sigmoid(tf.matmul(x, W) + b)
+
+WN = tf.Variable(tf.zeros([784, hiddenLayerSize]))
+bN = tf.Variable(tf.zeros([hiddenLayerSize]))
+yh = tf.nn.sigmoid(tf.matmul(x, WN) + bN)
+y = tf.nn.softmax(tf.matmul(yh, W) + b)
 
 y_ = tf.placeholder(tf.float32, [None, 10])
-# cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
-cross_entropy = tf.losses.mean_squared_error(y, y_)
+cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
 train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
 
 init = tf.global_variables_initializer()
