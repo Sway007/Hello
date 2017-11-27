@@ -29,7 +29,12 @@ class nnetwork:
     def get_layer_num(self):
         return len(self.size)
 
-    
+    def train(self, training_data, iter_num, mini_batch_size, eta):
+        '''
+        train by using stochastic gradient descent
+        '''
+        
+
 
 if __name__=='__main__':
     net = nnetwork([5,6,2])
