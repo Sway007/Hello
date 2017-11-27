@@ -5,7 +5,8 @@ import tensorflow as tf
 
 import math
 
-hiddenLayerSize = (int)(math.log2(784) + 4)
+#hiddenLayerSize = (int)(math.log2(784) + 4)
+hiddenLayerSize = 100
 print(hiddenLayerSize)
 
 x = tf.placeholder(tf.float32, [None, 784])
