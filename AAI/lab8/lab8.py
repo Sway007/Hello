@@ -1,4 +1,5 @@
 import numpy as np
+import NeuralNetwork as nn
 
 
 def train(images, one_hot_labels):
