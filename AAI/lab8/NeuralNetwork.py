@@ -8,8 +8,8 @@ def sigmoid(z):
     return 1./(1. + np.exp(-z))
 
 def sigmod_derivative(z):
-    
-    return sigmoid(z) * (1 - sigmoid(z))
+
+    return np.array(sigmoid(z)) * np.array((1 - sigmoid(z)))
 
 
 class nnetwork:
@@ -24,10 +24,10 @@ class nnetwork:
 
         self.size = size
 
-        self.biases = [np.zeros(n) for n in size[1:]]
+        self.biases = [np.random.randn(n, 1) for n in size[1:]]
         # weights: w_{ij}^{l} is the weight
         #        (l-1)th layer's jth neuron  ----> (l)th layer's ith neuron
-        self.weights = [np.zeros((m, n)) for m, n in zip(size[1:], size[:-1])]
+        self.weights = [np.random.randn(m, n) for m, n in zip(size[1:], size[:-1])]
         
     def get_layer_num(self):
         return len(self.size)
@@ -39,17 +39,17 @@ class nnetwork:
         train by using stochastic gradient descent
         '''
         train_set_size = len(training_data)
-        for i in xrange(iter_num):
+        for i in range(iter_num):
             
             random.shuffle(training_data)
             mini_batchs = [ training_data[k: k + mini_batch_size]
-                for k in xrange(0, train_set_size, mini_batch_size) ]
+                for k in range(0, train_set_size, mini_batch_size) ]
             for mini_batch in mini_batchs:
                 self.learning(mini_batch, eta)
 
             if test_data:
                 print("Epoch {0}: {1} / {2}".format(
-                    i, self.evaluate(test_data), train_set_size)
+                    i, self.evaluate(test_data), len(test_data))
                 )
             else:
                 print("Epoch {0} complete".format(i))
@@ -61,7 +61,6 @@ class nnetwork:
         @param
             eta: learning rate
         '''
-        # TODO
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         for x, y in batch:
@@ -74,6 +73,7 @@ class nnetwork:
             for w, nw in zip(self.weights, nabla_w)]
         self.biases = [b - rate * nb 
             for b, nb in zip(self.biases, nabla_b)]
+        pass
 
     def backprop(self, x, y):
         '''
@@ -87,21 +87,21 @@ class nnetwork:
         zs = []
 
         for b, w in zip(self.biases, self.weights):
-            z = w * activation + b
+            z = np.dot(w, activation) + np.mat(b)
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
         
         # backward
-        delta = self.cost_derivative(activations[-1], y) * sigmod_derivative(zs[-1])
+        delta = np.array(self.cost_derivative(activations[-1], y)) * np.array(sigmod_derivative(zs[-1]))
         ret_nabla_b[-1] = delta
-        ret_nabla_w[-1] = delta * activations[-2]
+        ret_nabla_w[-1] = delta * activations[-2].transpose()
 
-        for l in xrange(2, self.get_layer_num()):
+        for l in range(2, self.get_layer_num()):
             z = zs[-l]
-            delta = self.weights[-l+1] * delta * sigmod_derivative(z)
+            delta = np.array(np.mat(self.weights[-l+1]).transpose() * np.mat(delta)) * np.array(sigmod_derivative(z))
             ret_nabla_b[-l] = delta
-            ret_nabla_w[-l] = delta * activations[-l-1]
+            ret_nabla_w[-l] = np.mat(delta) * np.mat(activations[-l-1]).transpose()
 
         return ret_nabla_b, ret_nabla_w
 
@@ -114,7 +114,7 @@ class nnetwork:
         '''
         ret = input
         for b, w in zip(self.biases, self.weights):
-            z = np.mat(w) * np.mat(ret).transpose() + np.mat(b).transpose()
+            z = np.mat(w) * np.mat(ret) + np.mat(b)
             ret = sigmoid(z)
         return ret
     
@@ -125,10 +125,13 @@ class nnetwork:
         return sum(int(x==y) for x, y in test_results)
         
 
-if __name__=='__main__':
+if __name__ == '__main__':
     
     import mnist_loader
-    training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
+    training_data, validation_data, test_data = (list(r) for r in mnist_loader.load_data_wrapper())
 
-    net = nnetwork([784,30,10])
+    import cifar10
+
+
+    net = nnetwork([784, 30, 10])
     net.train(training_data, 30, 10, 3.0, test_data=test_data)
