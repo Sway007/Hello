@@ -6,7 +6,7 @@ import tensorflow as tf
 import math
 
 #hiddenLayerSize = (int)(math.log2(784) + 4)
-hiddenLayerSize = 100
+hiddenLayerSize = 30
 print(hiddenLayerSize)
 
 x = tf.placeholder(tf.float32, [None, 784])
@@ -35,24 +35,24 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 print(sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
 
 
-import numpy as np
-import matplotlib.pyplot as plt
+# import numpy as np
+# import matplotlib.pyplot as plt
 
-acc = sess.run(correct_prediction, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
-ind, = np.where(acc == False)
+# acc = sess.run(correct_prediction, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
+# ind, = np.where(acc == False)
 
-print(ind)
+# print(ind)
 
-failedImgs = mnist.test.images[ind]
-testi = 0
-theFaildeImg = failedImgs[testi]
-plt.imshow(theFaildeImg.reshape(28,28))
-print(mnist.test.labels[ind[testi]])
-correct = np.argmax(mnist.test.labels[ind[testi]])
-print('correct: ',correct)
+# failedImgs = mnist.test.images[ind]
+# testi = 0
+# theFaildeImg = failedImgs[testi]
+# plt.imshow(theFaildeImg.reshape(28,28))
+# print(mnist.test.labels[ind[testi]])
+# correct = np.argmax(mnist.test.labels[ind[testi]])
+# print('correct: ',correct)
 
-wrong = y.eval({x: mnist.test.images, y_: mnist.test.labels}, sess)[ind][testi]
-print(wrong)
-print('wrong: ', np.argmax(wrong))
+# wrong = y.eval({x: mnist.test.images, y_: mnist.test.labels}, sess)[ind][testi]
+# print(wrong)
+# print('wrong: ', np.argmax(wrong))
 
-plt.show()
+# plt.show()

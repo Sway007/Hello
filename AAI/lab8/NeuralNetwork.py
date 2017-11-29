@@ -126,12 +126,41 @@ class nnetwork:
         
 
 if __name__ == '__main__':
-    
-    import mnist_loader
-    training_data, validation_data, test_data = (list(r) for r in mnist_loader.load_data_wrapper())
 
     import cifar10
+    def data_reshape(data, type_img=True):
+
+        if type_img:
+            return data.reshape(-1, 3072,1)
+        else:
+            return data.reshape(-1, 10, 1)
+
+    images_train, cls_idx_train, labels_train = cifar10.load_training_data()
+    images_train = data_reshape(images_train)
+    labels_train = data_reshape(labels_train, type_img=False)
+    training_data = [(x, y) for x, y in zip(images_train, cls_idx_train)]
+
+    images_test, cls_idx_test, lables_test = cifar10.load_test_data()
+    images_test = data_reshape(images_test)
+    lables_test = data_reshape(lables_test, type_img=False)
+    test_data = [(x, y) for x, y in zip(images_test, cls_idx_test)]
+
+    net = nnetwork([3072, 120, 10])
+
+    # test
+    # class_names = cifar10.load_class_names()
+    # import matplotlib.pyplot as plt
+    # ind = 3
+    # plt.imshow(test_data[ind][0].reshape(32,32,3))
+    # plt.xlabel('{}'.format(class_names[test_data[ind][1]]))
+    # plt.show()
+    ############################
 
 
-    net = nnetwork([784, 30, 10])
-    net.train(training_data, 30, 10, 3.0, test_data=test_data)
+    # import mnist_loader
+    # training_data, validation_data, test_data = (list(r) for r in mnist_loader.load_data_wrapper())
+
+    # net = nnetwork([784, 30, 10])
+
+
+    net.train(training_data, 10, 40, 3.0, test_data=test_data)
