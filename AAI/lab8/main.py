@@ -3,7 +3,8 @@ import random
 import matplotlib.pyplot as plt
 
 import cifar10
-from lab8 import predict, train
+# from lab8 import predict, train
+from lab8 import  train
 
 
 def plot_9images(images, cls_idx_true, cls_idx_pred=None, all_cls_names=None, smooth=True):
@@ -72,7 +73,7 @@ def main():
     plot_9images(images=images_test[samples], cls_idx_true=cls_idx_test[samples],
                  cls_idx_pred=predict(images_test[samples]), all_cls_names=class_names, smooth=True)
 
-    print(f'\nAccuracy: {(predict(images_test) == cls_idx_test).mean() * 100}%\n')
+    # print(f'\nAccuracy: {(predict(images_test) == cls_idx_test).mean() * 100}%\n')
 
 if __name__ == '__main__':
     main()

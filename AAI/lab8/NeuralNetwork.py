@@ -147,20 +147,4 @@ if __name__ == '__main__':
 
     net = nnetwork([3072, 120, 10])
 
-    # test
-    # class_names = cifar10.load_class_names()
-    # import matplotlib.pyplot as plt
-    # ind = 3
-    # plt.imshow(test_data[ind][0].reshape(32,32,3))
-    # plt.xlabel('{}'.format(class_names[test_data[ind][1]]))
-    # plt.show()
-    ############################
-
-
-    # import mnist_loader
-    # training_data, validation_data, test_data = (list(r) for r in mnist_loader.load_data_wrapper())
-
-    # net = nnetwork([784, 30, 10])
-
-
     net.train(training_data, 10, 40, 3.0, test_data=test_data)
