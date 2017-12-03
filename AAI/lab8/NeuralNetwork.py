@@ -145,6 +145,6 @@ if __name__ == '__main__':
     lables_test = data_reshape(lables_test, type_img=False)
     test_data = [(x, y) for x, y in zip(images_test, cls_idx_test)]
 
-    net = nnetwork([3072, 120, 10])
+    net = nnetwork([3072, 50, 10])
 
     net.train(training_data, 10, 40, 3.0, test_data=test_data)
