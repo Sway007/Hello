@@ -1,14 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-class data_unit:
-    
-    def __init__(self, str):
-        
-        infos = str.split()
-        self.feature_num = len(infos) - 1
-        self.cl = infos[0]
-        self.features = [inf.split(':')[-1] for inf in infos[1:]]
 
 def read_data(path):
     
@@ -19,17 +11,16 @@ def read_data(path):
         clss = np.zeros(num)
 
         tmp = lines[0].split()
-        feature_num = len(tmp) - 1
         f_lables = [la.split(':')[0] for la in tmp[1:]]
-        features = dict.fromkeys(f_lables, [])
+        features = dict([(i, np.zeros(num)) for i in f_lables])
 
         k = 0
         for line in lines:
             infos = line.split()
-            clss[k] = infos[0]
+            clss[k] = int(infos[0])
             for info in infos[1:]:
                 fn_and_f = info.split(':')
-                features[fn_and_f[0]].append( fn_and_f[1] )
+                features[fn_and_f[0]][k] = ( float(fn_and_f[1]) )
 
             k += 1
 
@@ -40,3 +31,14 @@ if __name__ == '__main__':
     clss, features = read_data('data')
     for i in range(4):
         print(clss[i], ' ', features['1'][i], features['2'][i])
+    
+    figure = plt.figure()
+    ax = figure.add_subplot(111)
+
+    ind_cl1 = (np.where(clss == -1))[0]
+    ax.plot(features['1'][ind_cl1], features['2'][ind_cl1], 'ro')
+
+    ind_cl2 = np.where(clss == 1)[0]
+    ax.plot(features['1'][ind_cl2], features['2'][ind_cl2], 'b*')
+
+    plt.show()
