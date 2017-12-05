@@ -1,44 +1,53 @@
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.datasets.samples_generator import make_blobs
+
+X, y = make_blobs(200, 2, centers=[[-10,-10], [-10, 10], [10, 10], [10, -10]], cluster_std=4.0)
+# y = [1, 2, 1, 2]
+i3 = np.where(y == 2)
+i4 = np.where(y == 3)
+y[i3] = 0
+y[i4] = 1
+print(y)
+
+plt.scatter(X[:, 0], X[:, 1], c=y, s=50, cmap='autumn')
 
 
-def read_data(path):
+from sklearn.svm import SVC
+
+def plot_svc_decision_function(model, ax=None, plot_support=True):
+    """Plot the decision function for a 2D SVC"""
+    if ax is None:
+        ax = plt.gca()
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
     
-    with open(path, 'r') as f:
-
-        lines = f.readlines()
-        num = len(lines)
-        clss = np.zeros(num)
-
-        tmp = lines[0].split()
-        f_lables = [la.split(':')[0] for la in tmp[1:]]
-        features = dict([(i, np.zeros(num)) for i in f_lables])
-
-        k = 0
-        for line in lines:
-            infos = line.split()
-            clss[k] = int(infos[0])
-            for info in infos[1:]:
-                fn_and_f = info.split(':')
-                features[fn_and_f[0]][k] = ( float(fn_and_f[1]) )
-
-            k += 1
-
-    return clss, features
-
-if __name__ == '__main__':
-
-    clss, features = read_data('data')
-    for i in range(4):
-        print(clss[i], ' ', features['1'][i], features['2'][i])
+    # create grid to evaluate model
+    x = np.linspace(xlim[0], xlim[1], 30)
+    y = np.linspace(ylim[0], ylim[1], 30)
+    Y, X = np.meshgrid(y, x)
+    xy = np.vstack([X.ravel(), Y.ravel()]).T
+    P = model.decision_function(xy).reshape(X.shape)
     
-    figure = plt.figure()
-    ax = figure.add_subplot(111)
+    # plot decision boundary and margins
+    ax.contour(X, Y, P, colors='k',
+               levels=[-1, 0, 1], alpha=0.5,
+               linestyles=['--', '-', '--'])
+    
+    # plot support vectors
+    if plot_support:
+        ax.scatter(model.support_vectors_[:, 0],
+                   model.support_vectors_[:, 1],
+                   s=300, linewidth=1
+                   , alpha=0.3
+                #    , facecolors='none'
+                   )
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
 
-    ind_cl1 = (np.where(clss == -1))[0]
-    ax.plot(features['1'][ind_cl1], features['2'][ind_cl1], 'ro')
+model = SVC(kernel='rbf', C=0.1)
+model.fit(X, y)
+plot_svc_decision_function(model, plot_support=False)
 
-    ind_cl2 = np.where(clss == 1)[0]
-    ax.plot(features['1'][ind_cl2], features['2'][ind_cl2], 'b*')
-
-    plt.show()
+plt.show()
